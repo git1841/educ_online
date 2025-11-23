@@ -332,6 +332,7 @@
 {% endblock %}
 
 {% block content %}
+
 <br>
 <div class="container-fluid p-0">
     <div class="chat-container">
@@ -373,14 +374,15 @@
 
             <!-- Input -->
             <div class="message-input-area">
-                <form id="sendMessageForm" enctype="multipart/form-data">
+                <form id="sendMessageForm" method="post" action="/send_group_message" enctype="multipart/form-data">
                     <input type="hidden" name="conversation_id" value="{{ group.id }}">
+                    <input type="hidden" name="message_type" id="messageType" value="text">
                     <div class="input-group">
                         <button type="button" class="btn btn-attach" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">
                             <i class="bi bi-paperclip"></i>
                         </button>
-                        <input type="file" id="fileInput" name="file" style="display: none;">
-                        <input type="text" class="form-control" name="content" id="messageContent" placeholder="Tapez votre message..." autocomplete="off">
+                        <input type="file" id="fileInput" name="file" style="display: none;" onchange="handleFileSelect(this)">
+                        <input type="text" class="form-control" name="content" id="messageContent" placeholder="Tapez votre message..." autocomplete="off" required>
                         <button type="submit" class="btn btn-send" title="Envoyer">
                             <i class="bi bi-send"></i>
                         </button>
@@ -482,19 +484,25 @@
     let ws = null;
 
     function connectWebSocket() {
-        ws = new WebSocket(`ws://${window.location.host}/ws/notifications/{{ user.id }}`);
-        
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'new_message' && data.message.conversation_id === {{ group.id }}) {
-                displayMessage(data.message);
-            }
-        };
-        
-        ws.onerror = () => {
-            setTimeout(connectWebSocket, 3000);
-        };
-    }
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${protocol}//${window.location.host}/ws/notifications/{{ user.id }}`);
+    
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'new_message' && data.message.conversation_id === {{ group.id }}) {
+            displayMessage(data.message);
+        }
+    };
+    
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setTimeout(connectWebSocket, 3000);
+    };
+    
+    ws.onclose = () => {
+        setTimeout(connectWebSocket, 3000);
+    };
+}
 
     connectWebSocket();
 
@@ -617,10 +625,24 @@
         }
     }
 
-    // Le reste du code JavaScript reste identique...
+    // Le reste du code JavaScript reste identique... sendMessageForm
     document.getElementById('inviteModal').addEventListener('show.bs.modal', function () {
         loadAvailableUsers();
         loadPendingInvites();
     });
+
+    function handleFileSelect(input) {
+    if (input.files[0]) {
+        const file = input.files[0];
+        // Déterminer le type de message  connectWebSocket
+        if (file.type.startsWith('image/')) {
+            document.getElementById('messageType').value = 'image';
+        } else if (file.type.startsWith('video/')) {
+            document.getElementById('messageType').value = 'video';
+        } else {
+            document.getElementById('messageType').value = 'file';
+        }
+    }
+}
 </script>
 {% endblock %}
