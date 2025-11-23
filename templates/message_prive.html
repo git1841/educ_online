@@ -300,6 +300,7 @@
 {% endblock %}
 
 {% block content %}
+
 <br>
 <div class="container-fluid p-0">
     <div class="chat-container">
@@ -359,14 +360,15 @@
             </div>
 
             <div id="messageInput" class="message-input-area" style="display: none;">
-                <form id="sendMessageForm" enctype="multipart/form-data">
+                <form id="sendMessageForm" method="post" action="/send_private_message" enctype="multipart/form-data">
                     <input type="hidden" id="currentConversationId" name="conversation_id">
+                    <input type="hidden" name="message_type" id="messageType" value="text">
                     <div class="input-group">
                         <button type="button" class="btn btn-attach" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">
                             <i class="bi bi-paperclip"></i>
                         </button>
                         <input type="file" id="fileInput" name="file" style="display: none;" onchange="handleFileSelect(this)">
-                        <input type="text" class="form-control" name="content" id="messageContent" placeholder="Tapez votre message..." autocomplete="off">
+                        <input type="text" class="form-control" name="content" id="messageContent" placeholder="Tapez votre message..." autocomplete="off" required>
                         <button type="submit" class="btn btn-send" title="Envoyer">
                             <i class="bi bi-send"></i>
                         </button>
@@ -380,11 +382,13 @@
                     </div>
                 </form>
             </div>
+
+
         </div>
     </div>
 </div>
 
-<!-- New Chat Modal -->
+<!-- New Chat Modal messageInput handleFileSelect -->
 <div class="modal fade" id="newChatModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -425,18 +429,24 @@
     let ws = null;
 
     function connectWebSocket() {
-        ws = new WebSocket(`ws://${window.location.host}/ws/notifications/{{ user.id }}`);
-        
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'new_message' && data.message.conversation_id === currentConversationId) {
-                displayMessage(data.message);
-            }
-        };
-        
-        ws.onerror = () => {
-            setTimeout(connectWebSocket, 3000);
-        };
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${protocol}//${window.location.host}/ws/notifications/{{ user.id }}`);
+    
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'new_message' && data.message.conversation_id === currentConversationId) {
+            displayMessage(data.message);
+        }
+    };
+    
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setTimeout(connectWebSocket, 3000);
+    };
+    
+    ws.onclose = () => {
+        setTimeout(connectWebSocket, 3000);
+    };
     }
 
     connectWebSocket();
@@ -530,10 +540,20 @@
     });
 
     function handleFileSelect(input) {
-        if (input.files[0]) {
-            document.getElementById('filePreview').style.display = 'block';
-            document.getElementById('fileName').textContent = input.files[0].name;
+    if (input.files[0]) {
+        document.getElementById('filePreview').style.display = 'block';
+        document.getElementById('fileName').textContent = input.files[0].name;
+        
+        // Déterminer le type de message
+        const file = input.files[0];
+        if (file.type.startsWith('image/')) {
+            document.getElementById('messageType').value = 'image';
+        } else if (file.type.startsWith('video/')) {
+            document.getElementById('messageType').value = 'video';
+        } else {
+            document.getElementById('messageType').value = 'file';
         }
+    }
     }
 
     function clearFile() {
