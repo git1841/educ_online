@@ -1,0 +1,805 @@
+{% extends "base.html" %}
+
+{% block title %}Administration - EduMath-Info{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --accent-color: #06b6d4;
+        --math-color: #f59e0b;
+        --info-color: #10b981;
+        --dark-color: #1e293b;
+        --light-color: #f8fafc;
+        --text-color: #334155;
+        --text-light: #64748b;
+        --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        --gradient-math: linear-gradient(135deg, var(--math-color), #f97316);
+        --gradient-info: linear-gradient(135deg, var(--info-color), #059669);
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    .admin-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card .display-4 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 2rem;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: var(--text-light);
+        font-weight: 500;
+        padding: 1rem 1.5rem;
+        border-radius: 10px 10px 0 0;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: var(--primary-color);
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .nav-tabs .nav-link.active {
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .table {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .table thead th {
+        background: var(--light-color);
+        border: none;
+        font-weight: 600;
+        color: var(--text-color);
+        padding: 1rem;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .btn-outline-primary, .btn-outline-success, .btn-outline-warning, .btn-outline-danger {
+        border-width: 2px;
+        border-radius: 8px;
+        padding: 0.375rem 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover, .btn-outline-success:hover, 
+    .btn-outline-warning:hover, .btn-outline-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .modal-header {
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+    }
+
+    .badge {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 12px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .admin-header {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-card {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .stat-icon {
+            margin: 0 auto 1rem;
+        }
+
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs .nav-link {
+            white-space: nowrap;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .admin-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .stat-card .display-4 {
+            font-size: 2rem;
+        }
+
+        .modal-dialog {
+            margin: 10px;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    /* Animations */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Loading states */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .loading-overlay.show {
+        display: flex;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="admin-header fade-in">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-0"><i class="bi bi-shield-lock-fill me-2"></i> Panneau d'Administration</h2>
+                <p class="mb-0 mt-2 opacity-75">Gérez la plateforme et ses utilisateurs</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <small>Connecté en tant qu'administrateur</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6 fade-in">
+            <div class="card stat-card text-center">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h3 class="display-4 text-primary">{{ stats.total_users }}</h3>
+                <p class="mb-0 text-muted">Utilisateurs Total</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 fade-in">
+            <div class="card stat-card text-center">
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-star"></i>
+                </div>
+                <h3 class="display-4 text-success">{{ stats.pro_users }}</h3>
+                <p class="mb-0 text-muted">Comptes PRO</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 fade-in">
+            <div class="card stat-card text-center">
+                <div class="stat-icon bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-file-earmark"></i>
+                </div>
+                <h3 class="display-4 text-info">{{ stats.total_contents }}</h3>
+                <p class="mb-0 text-muted">Contenus</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 fade-in">
+            <div class="card stat-card text-center">
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-clock"></i>
+                </div>
+                <h3 class="display-4 text-warning">{{ stats.pending_groups }}</h3>
+                <p class="mb-0 text-muted">Demandes en attente</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#users">
+                <i class="bi bi-people me-1"></i> Utilisateurs
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#contents">
+                <i class="bi bi-folder me-1"></i> Contenus
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#groups">
+                <i class="bi bi-diagram-3 me-1"></i> Groupes
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#publications">
+                <i class="bi bi-megaphone me-1"></i> Publications
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#proUpgrades">
+                <i class="bi bi-star me-1"></i> Demandes PRO 
+                {% if stats.pending_pro_upgrades > 0 %}
+                <span class="badge bg-danger ms-1">{{ stats.pending_pro_upgrades }}</span>
+                {% endif %}
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-people-fill"></i> Gestion des Utilisateurs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Téléphone</th>
+                                    <th>Type</th>
+                                    <th>Statut</th>
+                                    <th>Vérifié</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                <tr>
+                                    <td>{{ u.id }}</td>
+                                    <td>{{ u.first_name }} {{ u.last_name or '' }}</td>
+                                    <td>{{ u.phone }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if u.user_type == 'pro' else 'secondary' }}">
+                                            {{ u.user_type|upper }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if u.is_active else 'danger' }}">
+                                            {{ 'Actif' if u.is_active else 'Inactif' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if u.is_verified else 'warning' }}">
+                                            {{ 'Vérifié' if u.is_verified else 'Non vérifié' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="toggleUserActive({{ u.id }})" title="Activer/Désactiver">
+                                                <i class="bi bi-toggle-on"></i>
+                                            </button>
+                                            {% if not u.is_verified %}
+                                            <button class="btn btn-sm btn-outline-success" onclick="verifyUser({{ u.id }})" title="Vérifier">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-outline-warning" onclick="issueWarning({{ u.id }}, '{{ u.first_name }}')" title="Avertir">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contents Tab -->
+        <div class="tab-pane fade" id="contents">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-folder-fill"></i> Gestion des Contenus</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadContentModal">
+                        <i class="bi bi-cloud-upload"></i> Upload Contenu
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titre</th>
+                                    <th>Type</th>
+                                    <th>Accès</th>
+                                    <th>Classe</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in contents %}
+                                <tr>
+                                    <td>{{ c.id }}</td>
+                                    <td>{{ c.title }}</td>
+                                    <td><span class="badge bg-info">{{ c.content_type|upper }}</span></td>
+                                    <td>
+                                        <span class="badge bg-{{ 'warning' if c.access_type == 'pro' else 'success' }}">
+                                            {{ c.access_type|upper }}
+                                        </span>
+                                    </td>
+                                    <td>{{ c.class_level or '-' }}</td>
+                                    <td>{{ c.created_at.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-warning" onclick="toggleContentAccess({{ c.id }})" title="Changer accès">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteContent({{ c.id }})" title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Groups Tab -->
+        <div class="tab-pane fade" id="groups">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3-fill"></i> Demandes de Groupes</h5>
+                </div>
+                <div class="card-body">
+                    {% if group_requests %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nom du groupe</th>
+                                    <th>Demandé par</th>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for gr in group_requests %}
+                                <tr>
+                                    <td><strong>{{ gr.group_name }}</strong></td>
+                                    <td>{{ gr.first_name }} {{ gr.last_name or '' }}</td>
+                                    <td>{{ gr.description or '-' }}</td>
+                                    <td>{{ gr.created_at.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-success" onclick="approveGroup({{ gr.id }})">
+                                                <i class="bi bi-check-circle"></i> Approuver
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="rejectGroup({{ gr.id }})">
+                                                <i class="bi bi-x-circle"></i> Rejeter
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">Aucune demande en attente</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Publications Tab -->
+        <div class="tab-pane fade" id="publications">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-megaphone-fill"></i> Publications</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPublicationModal">
+                        <i class="bi bi-plus-circle"></i> Nouvelle Publication
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Contenu</th>
+                                    <th>Audience</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pub in publications %}
+                                <tr>
+                                    <td><strong>{{ pub.title }}</strong></td>
+                                    <td>{{ pub.content[:100] }}...</td>
+                                    <td><span class="badge bg-info">{{ pub.target_audience|upper }}</span></td>
+                                    <td>{{ pub.created_at.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deletePublication({{ pub.id }})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRO Upgrades Tab -->
+        <div class="tab-pane fade" id="proUpgrades">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-star-fill"></i> Demandes d'Upgrade PRO</h5>
+                </div>
+                <div class="card-body">
+                    {% if pro_upgrade_requests %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Téléphone</th>
+                                    <th>Opérateur</th>
+                                    <th>Montant</th>
+                                    <th>Transaction ID</th>
+                                    <th>Preuve</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in pro_upgrade_requests %}
+                                <tr>
+                                    <td>{{ req.first_name }} {{ req.last_name or '' }}</td>
+                                    <td>{{ req.phone }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ req.operator }}</span>
+                                    </td>
+                                    <td><strong>{{ req.amount }} Ar</strong></td>
+                                    <td><code>{{ req.transaction_id }}</code></td>
+                                    <td>
+                                        {% if req.proof_image %}
+                                        <a href="{{ req.proof_image }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-image"></i> Voir
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-success" onclick="approveProUpgrade({{ req.id }})">
+                                                <i class="bi bi-check-circle"></i> Approuver
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="rejectProUpgrade({{ req.id }})">
+                                                <i class="bi bi-x-circle"></i> Rejeter
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">Aucune demande en attente</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Content Modal -->
+<div class="modal fade" id="uploadContentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Contenu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadContentForm" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Titre *</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Type *</label>
+                            <select class="form-select" name="content_type" required>
+                                <option value="pdf">PDF</option>
+                                <option value="video">Vidéo</option>
+                                <option value="image">Image</option>
+                                <option value="book">Livre</option>
+                                <option value="audio">Audio</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Type d'accès *</label>
+                            <select class="form-select" name="access_type" required>
+                                <option value="free">Gratuit</option>
+                                <option value="pro">PRO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Classe</label>
+                            <select class="form-select" name="class_level">
+                                <option value="">Toutes</option>
+                                <option value="6ème">6ème</option>
+                                <option value="5ème">5ème</option>
+                                <option value="4ème">4ème</option>
+                                <option value="3ème">3ème</option>
+                                <option value="Seconde">Seconde</option>
+                                <option value="Première">Première</option>
+                                <option value="Terminale">Terminale</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Matière</label>
+                            <input type="text" class="form-control" name="subject">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fichier *</label>
+                        <input type="file" class="form-control" name="file" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-cloud-upload"></i> Upload
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Publication Modal -->
+<div class="modal fade" id="createPublicationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle Publication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createPublicationForm">
+                    <div class="mb-3">
+                        <label class="form-label">Titre *</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contenu *</label>
+                        <textarea class="form-control" name="content" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Audience *</label>
+                        <select class="form-select" name="target_audience" required>
+                            <option value="all">Tous</option>
+                            <option value="free">Utilisateurs Free</option>
+                            <option value="pro">Utilisateurs PRO</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-send"></i> Publier
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Warning Modal -->
+<div class="modal fade" id="warningModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Émettre un Avertissement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="warningForm">
+                    <input type="hidden" id="warningUserId" name="user_id">
+                    <p>Utilisateur: <strong id="warningUserName"></strong></p>
+                    <div class="mb-3">
+                        <label class="form-label">Raison *</label>
+                        <textarea class="form-control" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gravité *</label>
+                        <select class="form-select" name="warning_type" required>
+                            <option value="minor">Mineur</option>
+                            <option value="major">Majeur</option>
+                            <option value="critical">Critique</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="bi bi-exclamation-triangle"></i> Émettre
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p class="mt-2 text-muted">Traitement en cours...</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/admin.js"></script>
+<script>
+    // Show loading overlay
+    function showLoading() {
+        document.getElementById('loadingOverlay').classList.add('show');
+    }
+
+    // Hide loading overlay
+    function hideLoading() {
+        document.getElementById('loadingOverlay').classList.remove('show');
+    }
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+
+    // Smooth animations for tab switches
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            const targetPane = document.querySelector(e.target.getAttribute('href'));
+            targetPane.style.opacity = '0';
+            targetPane.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                targetPane.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                targetPane.style.opacity = '1';
+                targetPane.style.transform = 'translateY(0)';
+            }, 50);
+        });
+    });
+</script>
+{% endblock %}

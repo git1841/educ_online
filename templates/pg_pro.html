@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Pro - EduMath-Info{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white fade-in">
+                <div class="card-body text-center py-4">
+                    <h2 class="mb-3"><i class="bi bi-star-fill"></i> Bienvenue {{ user.first_name }}!</h2>
+                    <p class="mb-3">Compte PRO - Accès illimité à tous les contenus</p>
+                    <div class="badge bg-warning text-dark fs-6">
+                        <i class="bi bi-patch-check"></i> Compte vérifié
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publications Section -->
+    {% if publications %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="bi bi-megaphone"></i> Annonces</h4>
+            <div id="publicationsCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for pub in publications %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ pub.title }}</h5>
+                                <p class="card-text">{{ pub.content }}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> {{ pub.created_at.strftime('%d/%m/%Y') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if publications|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#publicationsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#publicationsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <select class="form-select" id="filterType">
+                <option value="">Tous les types</option>
+                <option value="pdf">PDF</option>
+                <option value="video">Vidéo</option>
+                <option value="image">Image</option>
+                <option value="book">Livre</option>
+                <option value="audio">Audio</option>
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <select class="form-select" id="filterClass">
+                <option value="">Toutes les classes</option>
+                <option value="6ème">6ème</option>
+                <option value="5ème">5ème</option>
+                <option value="4ème">4ème</option>
+                <option value="3ème">3ème</option>
+                <option value="Seconde">Seconde</option>
+                <option value="Première">Première</option>
+                <option value="Terminale">Terminale</option>
+            </select>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <input type="text" class="form-control" id="searchContent" placeholder="Rechercher par titre...">
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="row g-4" id="contentGrid">
+        {% for content in contents %}
+        <div class="col-lg-4 col-md-6 content-item fade-in" 
+             data-type="{{ content.content_type }}" 
+             data-class="{{ content.class_level or '' }}"
+             data-title="{{ content.title|lower }}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-{{ 'primary' if content.content_type == 'pdf' else 'danger' if content.content_type == 'video' else 'info' }}">
+                            <i class="bi bi-{{ 'file-pdf' if content.content_type == 'pdf' else 'play-circle' if content.content_type == 'video' else 'image' if content.content_type == 'image' else 'book' if content.content_type == 'book' else 'music-note' }}"></i>
+                            {{ content.content_type|upper }}
+                        </span>
+                        {% if content.access_type == 'pro' %}
+                        <span class="badge bg-warning"><i class="bi bi-star"></i> PRO</span>
+                        {% endif %}
+                    </div>
+                    
+                    <h5 class="card-title">{{ content.title }}</h5>
+                    <p class="card-text text-muted">{{ content.description or 'Aucune description' }}</p>
+                    
+                    <div class="mb-3">
+                        {% if content.class_level %}
+                        <small class="text-muted d-block">
+                            <i class="bi bi-bookmark"></i> {{ content.class_level }}
+                        </small>
+                        {% endif %}
+                        {% if content.subject %}
+                        <small class="text-muted d-block">
+                            <i class="bi bi-tag"></i> {{ content.subject }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{{ content.drive_link }}" target="_blank" class="btn btn-primary w-100">
+                        <i class="bi bi-download"></i> Accéder
+                    </a>
+                </div>
+                <div class="card-footer bg-transparent text-muted">
+                    <small><i class="bi bi-calendar"></i> {{ content.created_at.strftime('%d/%m/%Y') }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not contents %}
+    <div class="text-center py-5 fade-in">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+        <h4 class="text-muted mt-3">Aucun contenu disponible</h4>
+        <p class="text-muted">Revenez plus tard pour de nouveaux contenus!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter functionality
+    const filterType = document.getElementById('filterType');
+    const filterClass = document.getElementById('filterClass');
+    const searchContent = document.getElementById('searchContent');
+    const contentItems = document.querySelectorAll('.content-item');
+
+    function applyFilters() {
+        const typeValue = filterType.value.toLowerCase();
+        const classValue = filterClass.value.toLowerCase();
+        const searchValue = searchContent.value.toLowerCase();
+
+        contentItems.forEach(item => {
+            const itemType = item.dataset.type.toLowerCase();
+            const itemClass = item.dataset.class.toLowerCase();
+            const itemTitle = item.dataset.title.toLowerCase();
+
+            const matchesType = !typeValue || itemType === typeValue;
+            const matchesClass = !classValue || itemClass === classValue;
+            const matchesSearch = !searchValue || itemTitle.includes(searchValue);
+
+            if (matchesType && matchesClass && matchesSearch) {
+                item.style.display = '';
+                item.classList.add('fade-in');
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    filterType.addEventListener('change', applyFilters);
+    filterClass.addEventListener('change', applyFilters);
+    searchContent.addEventListener('input', applyFilters);
+
+    // Auto-dismiss alerts
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+</script>
+{% endblock %}

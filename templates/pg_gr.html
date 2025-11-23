@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - EduMath-Info{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-success text-white fade-in">
+                <div class="card-body text-center py-4">
+                    <h2 class="mb-3"><i class="bi bi-person-circle"></i> Bienvenue {{ user.first_name }}!</h2>
+                    <p class="mb-3">Compte Gratuit - Accès au contenu gratuit</p>
+                    <a href="/upgrade_to_pro" class="btn btn-warning btn-lg">
+                        <i class="bi bi-star-fill"></i> Passer au PRO maintenant
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publications Section -->
+    {% if publications %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="bi bi-megaphone"></i> Annonces</h4>
+            <div id="publicationsCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for pub in publications %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ pub.title }}</h5>
+                                <p class="card-text">{{ pub.content }}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> {{ pub.created_at.strftime('%d/%m/%Y') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if publications|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#publicationsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#publicationsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pro Upgrade Banner 
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning fade-in">
+                <div class="card-body text-center py-4">
+                    <h5 class="mb-3"><i class="bi bi-star-fill text-warning"></i> Passez au compte PRO</h5>
+                    <p class="mb-3">Débloquez tous les contenus premium, créez des groupes et plus encore!</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-3">
+                                <li><i class="bi bi-check-circle text-success"></i> Accès illimité aux contenus</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Création de groupes</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Appels vidéo sans limite</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Support prioritaire</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="/upgrade_to_pro" class="btn btn-warning btn-lg">
+                        <i class="bi bi-arrow-up-circle"></i> En savoir plus
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <select class="form-select" id="filterType">
+                <option value="">Tous les types</option>
+                <option value="pdf">PDF</option>
+                <option value="video">Vidéo</option>
+                <option value="image">Image</option>
+                <option value="book">Livre</option>
+                <option value="audio">Audio</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="searchContent" placeholder="Rechercher...">
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="row g-4" id="contentGrid">
+        {% for content in contents %}
+        <div class="col-lg-4 col-md-6 content-item fade-in" 
+             data-type="{{ content.content_type }}" 
+             data-title="{{ content.title|lower }}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-{{ 'primary' if content.content_type == 'pdf' else 'danger' if content.content_type == 'video' else 'info' }}">
+                            <i class="bi bi-{{ 'file-pdf' if content.content_type == 'pdf' else 'play-circle' if content.content_type == 'video' else 'image' if content.content_type == 'image' else 'book' if content.content_type == 'book' else 'music-note' }}"></i>
+                            {{ content.content_type|upper }}
+                        </span>
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> GRATUIT</span>
+                    </div>
+                    
+                    <h5 class="card-title">{{ content.title }}</h5>
+                    <p class="card-text text-muted">{{ content.description or 'Aucune description' }}</p>
+                    
+                    <div class="mb-3">
+                        {% if content.class_level %}
+                        <small class="text-muted d-block">
+                            <i class="bi bi-bookmark"></i> {{ content.class_level }}
+                        </small>
+                        {% endif %}
+                        {% if content.subject %}
+                        <small class="text-muted d-block">
+                            <i class="bi bi-tag"></i> {{ content.subject }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{{ content.drive_link }}" target="_blank" class="btn btn-success w-100">
+                        <i class="bi bi-download"></i> Accéder
+                    </a>
+                </div>
+                <div class="card-footer bg-transparent text-muted">
+                    <small><i class="bi bi-calendar"></i> {{ content.created_at.strftime('%d/%m/%Y') }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not contents %}
+    <div class="text-center py-5 fade-in">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+        <h4 class="text-muted mt-3">Aucun contenu gratuit disponible</h4>
+        <p class="text-muted">Revenez plus tard ou passez au PRO pour plus de contenus!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter functionality
+    const filterType = document.getElementById('filterType');
+    const searchContent = document.getElementById('searchContent');
+    const contentItems = document.querySelectorAll('.content-item');
+
+    function applyFilters() {
+        const typeValue = filterType.value.toLowerCase();
+        const searchValue = searchContent.value.toLowerCase();
+
+        contentItems.forEach(item => {
+            const itemType = item.dataset.type.toLowerCase();
+            const itemTitle = item.dataset.title.toLowerCase();
+
+            const matchesType = !typeValue || itemType === typeValue;
+            const matchesSearch = !searchValue || itemTitle.includes(searchValue);
+
+            if (matchesType && matchesSearch) {
+                item.style.display = '';
+                item.classList.add('fade-in');
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    filterType.addEventListener('change', applyFilters);
+    searchContent.addEventListener('input', applyFilters);
+
+    // Auto-dismiss alerts
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+
+    // Smooth animations on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all content items
+    contentItems.forEach(item => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(item);
+    });
+</script>
+{% endblock %}

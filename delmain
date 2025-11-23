@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Fichier à modifier
+FILE="main.py"
+
+# Vérifier si le fichier existe
+if [ ! -f "$FILE" ]; then
+    echo "Erreur : $FILE n'existe pas dans le dossier courant."
+    exit 1
+fi
+
+# Supprimer ", response_class=HTMLResponse"
+sed -i "s/, *response_class=HTMLResponse//g" "$FILE"
+
+# Supprimer "request: Request"
+sed -i "s/request: Request//g" "$FILE"
+
+echo "Nettoyage terminé sur main.py"

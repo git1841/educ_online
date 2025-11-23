@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Passer au PRO - EduMath-Info{% endblock %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg fade-in">
+                <div class="card-header bg-gradient bg-warning text-dark text-center py-4">
+                    <h3 class="mb-0"><i class="bi bi-star-fill"></i> Passer au compte PRO</h3>
+                    <p class="mb-0 mt-2">Débloquez tout le potentiel de la plateforme</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Benefits -->
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="bi bi-gift"></i> Avantages du compte PRO:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="mb-0">
+                                    <li><i class="bi bi-check-circle text-success"></i> Accès à tout le contenu premium</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Création illimitée de groupes</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Appels vidéo sans limite</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="mb-0">
+                                    <li><i class="bi bi-check-circle text-success"></i> Support prioritaire</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Pas de publicités</li>
+                                    <li><i class="bi bi-check-circle text-success"></i> Accès anticipé aux nouveautés</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing -->
+                    <div class="text-center my-4">
+                        <div class="d-inline-block bg-warning bg-opacity-10 rounded p-4">
+                            <h2 class="display-3 fw-bold text-warning mb-0">10,000 Ar</h2>
+                            <p class="text-muted mb-0">Par mois</p>
+                            <small class="text-muted">Renouvellement automatique, annulation à tout moment</small>
+                        </div>
+                    </div>
+
+                    <!-- Payment Process -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-center mb-3">Comment procéder au paiement:</h6>
+                            <div class="d-flex justify-content-between flex-wrap">
+                                <div class="text-center mb-3">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-1-circle-fill text-primary fs-4"></i>
+                                    </div>
+                                    <p class="small mb-0">Envoyez 10,000 Ar</p>
+                                </div>
+                                <div class="text-center mb-3">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-2-circle-fill text-primary fs-4"></i>
+                                    </div>
+                                    <p class="small mb-0">Notez l'ID de transaction</p>
+                                </div>
+                                <div class="text-center mb-3">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-3-circle-fill text-primary fs-4"></i>
+                                    </div>
+                                    <p class="small mb-0">Prenez un screenshot</p>
+                                </div>
+                                <div class="text-center mb-3">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-4-circle-fill text-primary fs-4"></i>
+                                    </div>
+                                    <p class="small mb-0">Remplissez le formulaire</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <form id="upgradeForm" enctype="multipart/form-data">
+                        <h5 class="mb-3 text-center">Informations de paiement</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Opérateur Mobile Money *</label>
+                                <select class="form-select" name="operator" required>
+                                    <option value="">Sélectionner...</option>
+                                    <option value="Orange Money">Orange Money</option>
+                                    <option value="MVola">MVola</option>
+                                    <option value="Airtel Money">Airtel Money</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Numéro de téléphone *</label>
+                                <input type="tel" class="form-control" name="phone_number" 
+                                       placeholder="034 00 000 00" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Montant envoyé *</label>
+                                <input type="number" class="form-control" name="amount" 
+                                       value="10000" readonly required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ID/Référence de transaction *</label>
+                                <input type="text" class="form-control" name="transaction_id" 
+                                       placeholder="Ex: TXN123456789" required>
+                                <small class="text-muted">Vous recevez cet ID après l'envoi d'argent</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Preuve de paiement (Screenshot) *</label>
+                            <input type="file" class="form-control" name="proof_image" 
+                                   accept="image/*" required>
+                            <small class="text-muted">Capturez l'écran de la confirmation de paiement</small>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle"></i> <strong>Important:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Un administrateur vérifiera votre paiement sous 24h</li>
+                                <li>Vous recevrez une notification dès que votre compte sera activé</li>
+                                <li>Le renouvellement se fera automatiquement chaque mois</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-send"></i> Soumettre la demande
+                            </button>
+                            <a href="{% if user.user_type == 'free' %}/pg_gr{% else %}/pg_pro{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- My Requests -->
+                    <div class="mt-5">
+                        <h5 class="text-center mb-3">Mes demandes</h5>
+                        <div id="myRequests">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                <span class="ms-2">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Submit upgrade request
+    document.getElementById('upgradeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Envoi...';
+        
+        try {
+            const response = await fetch('/submit_pro_upgrade', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                alert('✅ ' + data.message);
+                e.target.reset();
+                loadMyRequests();
+            } else {
+                alert('❌ ' + (data.detail || 'Erreur'));
+            }
+        } catch (error) {
+            alert('❌ Erreur de connexion');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send"></i> Soumettre la demande';
+        }
+    });
+
+    // Load my requests
+    async function loadMyRequests() {
+        try {
+            const response = await fetch('/my_pro_requests');
+            const data = await response.json();
+            
+            const container = document.getElementById('myRequests');
+            
+            if (data.requests && data.requests.length > 0) {
+                container.innerHTML = data.requests.map(req => `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${req.operator} - ${req.amount} Ar</h6>
+                                    <p class="mb-1"><small>ID: ${req.transaction_id}</small></p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> ${new Date(req.created_at).toLocaleString('fr-FR')}
+                                    </small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-${
+                                        req.status === 'pending' ? 'warning text-dark' :
+                                        req.status === 'approved' ? 'success' : 'danger'
+                                    }">
+                                        ${req.status === 'pending' ? 'En attente' :
+                                          req.status === 'approved' ? 'Approuvé' : 'Rejeté'}
+                                    </span>
+                                </div>
+                            </div>
+                            ${req.proof_image ? `
+                            <div class="mt-2">
+                                <a href="${req.proof_image}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-image"></i> Voir la preuve
+                                </a>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="text-muted text-center">Aucune demande pour le moment</p>';
+            }
+        } catch (error) {
+            console.error('Error loading requests:', error);
+            container.innerHTML = '<p class="text-muted text-center">Erreur lors du chargement</p>';
+        }
+    }
+
+    // Load on page load
+    loadMyRequests();
+</script>
+{% endblock %}
