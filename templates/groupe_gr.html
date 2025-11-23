@@ -27,7 +27,7 @@
     </div>
     {% endif %}
 
-    <!-- Upgrade Banner -->
+    <!-- Upgrade Banner requestGroupForm -->
     <div class="card border-warning mb-4 fade-in">
         <div class="card-body text-center py-4">
             <h5><i class="bi bi-star-fill text-warning"></i> Créez des groupes instantanément avec PRO</h5>
@@ -96,8 +96,9 @@
                 <h5 class="modal-title">Demander un groupe</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
-                <form id="requestGroupForm">
+                <form id="requestGroupForm" method="post" action="/create_group_request">
                     <div class="mb-3">
                         <label class="form-label">Nom du groupe *</label>
                         <input type="text" class="form-control" name="group_name" required>
@@ -117,6 +118,7 @@
                     </button>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
