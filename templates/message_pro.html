@@ -294,7 +294,7 @@
 <br>
 <div class="container-fluid p-0">
     <div class="chat-container">
-        <!-- Conversations List -->
+        <!-- Conversations List messageInput-->
         <div class="conversations-list">
             <div class="p-3 border-bottom bg-white">
                 <h5 class="mb-0"><i class="bi bi-chat-dots"></i> Messages</h5>
@@ -353,33 +353,34 @@
                 </div>
             </div>
 
-            <div id="messageInput" class="message-input-area" style="display: none;">
-                <form id="sendMessageForm" enctype="multipart/form-data">
+            <div id="messageInput" class="p-3 border-top bg-white" style="display: none;">
+                <form id="sendMessageForm" method="post" action="/send_private_message" enctype="multipart/form-data">
                     <input type="hidden" id="currentConversationId" name="conversation_id">
+                    <input type="hidden" name="message_type" id="messageType" value="text">
                     <div class="input-group">
-                        <button type="button" class="btn btn-attach" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">
+                        <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fileInput').click()">
                             <i class="bi bi-paperclip"></i>
                         </button>
                         <input type="file" id="fileInput" name="file" style="display: none;" onchange="handleFileSelect(this)">
-                        <input type="text" class="form-control" name="content" id="messageContent" placeholder="Tapez votre message..." autocomplete="off">
-                        <button type="submit" class="btn btn-send" title="Envoyer">
-                            <i class="bi bi-send"></i>
+                        <input type="text" class="form-control" name="content" id="messageContent" placeholder="Tapez votre message..." autocomplete="off" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Envoyer
                         </button>
                     </div>
-                    <div id="filePreview" class="file-preview" style="display: none;">
-                        <small>
-                            <i class="bi bi-file-earmark me-1"></i>
-                            <span id="fileName"></span>
-                            <button type="button" class="btn btn-sm btn-link text-danger ms-2" onclick="clearFile()">Retirer</button>
+                    <div id="filePreview" class="mt-2" style="display: none;">
+                        <small class="text-muted">
+                            <i class="bi bi-file-earmark"></i> <span id="fileName"></span>
+                            <button type="button" class="btn btn-sm btn-link text-danger" onclick="clearFile()">Retirer</button>
                         </small>
                     </div>
                 </form>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- New Chat Modal -->
+<!-- New Chat Modal handleFileSelect-->
 <div class="modal fade" id="newChatModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -419,8 +420,10 @@
     let ws = null;
 
     // Connect WebSocket for notifications
+    // Connect WebSocket for notifications
     function connectWebSocket() {
-        ws = new WebSocket(`ws://${window.location.host}/ws/notifications/{{ user.id }}`);
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${protocol}//${window.location.host}/ws/notifications/{{ user.id }}`);
         
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -429,7 +432,12 @@
             }
         };
         
-        ws.onerror = () => {
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            setTimeout(connectWebSocket, 3000);
+        };
+        
+        ws.onclose = () => {
             setTimeout(connectWebSocket, 3000);
         };
     }
@@ -530,11 +538,21 @@
     });
 
     function handleFileSelect(input) {
-        if (input.files[0]) {
-            document.getElementById('filePreview').style.display = 'block';
-            document.getElementById('fileName').textContent = input.files[0].name;
+    if (input.files[0]) {
+        document.getElementById('filePreview').style.display = 'block';
+        document.getElementById('fileName').textContent = input.files[0].name;
+        
+        // Déterminer le type de message connectWebSocket
+        const file = input.files[0];
+        if (file.type.startsWith('image/')) {
+            document.getElementById('messageType').value = 'image';
+        } else if (file.type.startsWith('video/')) {
+            document.getElementById('messageType').value = 'video';
+        } else {
+            document.getElementById('messageType').value = 'file';
         }
     }
+}
 
     function clearFile() {
         document.getElementById('fileInput').value = '';
