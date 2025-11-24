@@ -2153,6 +2153,11 @@ async def get_group_members(request: Request, group_id: int):
         cursor.close()
         conn.close()
 
+@app.get("/cron")
+async def cron():
+    """Cron pour evité le en veille """
+    return {"cron" : "200 ok"}
+    
 # Run application
 if __name__ == "__main__":
     import uvicorn
